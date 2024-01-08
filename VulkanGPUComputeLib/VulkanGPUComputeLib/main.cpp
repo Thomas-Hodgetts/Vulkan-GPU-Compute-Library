@@ -1,13 +1,4 @@
-#include "vkGpuHandles.h"
-#include <filesystem>
-#include <fstream>
-
-struct CalculatorData
-{
-	float m_FirstNumber = 0, m_SecondNumber = 0, m_Output = 0, m_Padding = 0;
-	bool m_Addition = false, m_Subtraction = false, m_Multiplication = false, m_Division = false;
-};
-
+#include "CalculatorApp.h"
 
 void GenerateAndRunShaderCompile()
 {
@@ -50,85 +41,7 @@ int main()
 {
 	//GenerateAndRunShaderCompile();
 
+	CalculatorApp();
+	
 
-	std::cout << "Test Calculator App" << std::endl;
-
-	// System Set up
-	vkGenerics::vkQueueFamilyBit bit = vkGenerics::vkQueueFamilyBit::BASE;
-	bit |= vkGenerics::vkQueueFamilyBit::COMPUTE;
-	uint32_t memorySize = (sizeof(CalculatorData));
-	CalculatorData inputData;
-	VkExecuteHint hint = VkExecuteHint();
-
-
-	GPUHandle gpuHandle(GPUHandleMode::COMPUTE, std::vector<const char*>(), std::vector<const char*>());
-	GPUMemoryHandle gpuMemoryHandle = GPUMemoryHandle(&gpuHandle, memorySize);
-	GPUKernel calculatorMathKernel = GPUKernel(&gpuHandle, L"CalculatorShader.spv", "main");
-	GPUMemoryAdapter memoryAdapter = GPUMemoryAdapter(&gpuHandle, 1);
-	HostAccessablePtr calculatorMemory = gpuMemoryHandle.WriteDataToCpuVisablePool(&inputData, memorySize);
-	memoryAdapter.AttachMemory(calculatorMemory);
-	calculatorMathKernel.LinkMemory(&memoryAdapter, VK_PIPELINE_BIND_POINT_COMPUTE);
-
-	//Operation Code
-	bool InOperation = true;
-	while (InOperation)
-	{
-		std::string modeInput;
-
-		std::cout << "Select Mode +, -,*,/: ";
-		std::cin >> modeInput;
-		modeInput.resize(1);
-
-		switch (modeInput[0])
-		{
-		default:
-			inputData.m_Addition = 0;
-			inputData.m_Subtraction = 0;
-			inputData.m_Multiplication = 0;
-			inputData.m_Division = 0;
-			break;
-		case '+':
-			inputData.m_Addition = 1;
-			inputData.m_Subtraction = 0;
-			inputData.m_Multiplication = 0;
-			inputData.m_Division = 0;
-		case '-':
-			inputData.m_Addition = 0;
-			inputData.m_Subtraction = 1;
-			inputData.m_Multiplication = 0;
-			inputData.m_Division = 0;
-		case '*':
-			inputData.m_Addition = 0;
-			inputData.m_Subtraction = 0;
-			inputData.m_Multiplication = 1;
-			inputData.m_Division = 0;
-		case '/':
-			inputData.m_Addition = 0;
-			inputData.m_Subtraction = 0;
-			inputData.m_Multiplication = 0;
-			inputData.m_Division = 1;
-		}
-
-		std::cout << "First Number: ";
-		std::cin >> inputData.m_FirstNumber;
-		std::cout << "" << std::endl;
-		std::cout << "Second Number: ";
-		std::cin >> inputData.m_SecondNumber;
-		std::cout << "" << std::endl;
-
-		memoryAdapter.WriteData(&inputData);
-		calculatorMathKernel.RequestExecution(&gpuHandle, hint);
-		gpuHandle.ExecuteCompute();
-		memoryAdapter.ReadData(&inputData, memorySize);
-
-		std::cout << inputData.m_Output << std::endl;
-
-		std::cout << "Finished with application, type 'exit' to exit and press enter or hit enter to continue." << std::endl;
-		std::string exitCondition;
-		std::cin >> exitCondition;
-		if (exitCondition == "Exit" || exitCondition == "exit")
-		{
-			InOperation = false;
-		}
-	}
 }

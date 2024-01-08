@@ -133,11 +133,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CalculatorApp.h" />
     <ClInclude Include="Journal.h" />
     <ClInclude Include="vkGenerics.h" />
     <ClInclude Include="vkGpuHandles.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Calculator.cpp" />
     <ClCompile Include="Journal.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="vkGenerics.cpp" />
