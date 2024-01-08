@@ -1,6 +1,5 @@
 #pragma once
 #include <random>
-
 #include "vkGenerics.h"
 #include "Journal.h"
 
@@ -11,7 +10,7 @@ typedef vkGenerics::vkQueueFamilyBit ModeIndex;
 class vkInstanceContainer
 {
 public:
-	vkInstanceContainer() { m_Instance = nullptr; };
+	vkInstanceContainer() { m_Instance = new VkInstance(); };
 	~vkInstanceContainer()
 	{
 		if (m_Instance == nullptr)
@@ -32,7 +31,40 @@ public:
 		m_Instance = nullptr;
 	};
 
-	void InitPointer() { m_Instance = new VkInstance(); };
+	void CreateInstance(std::vector<const char*> layers, std::vector<const char*> extension)
+	{
+		VkApplicationInfo appInfo;
+		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+		appInfo.apiVersion = VK_API_VERSION_1_3;
+		appInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 1, 0);
+		appInfo.engineVersion = VK_MAKE_API_VERSION(0, 0, 1, 0);
+		appInfo.pEngineName = "Minerva";
+		appInfo.pApplicationName = "MinervaApplication";
+		appInfo.pNext = VK_NULL_HANDLE;
+
+		VkInstanceCreateInfo instanceInfo;
+		instanceInfo.pNext = VK_NULL_HANDLE;
+		instanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+		instanceInfo.flags = 0;
+		instanceInfo.pApplicationInfo = &appInfo;
+		instanceInfo.enabledExtensionCount = extension.size();
+		instanceInfo.enabledLayerCount = layers.size();
+		instanceInfo.ppEnabledExtensionNames = extension.data();
+		instanceInfo.ppEnabledLayerNames = layers.data();
+		VkResult result;
+
+#ifdef _DEBUG
+		result = vkGenerics::CreateDebugInstance(instanceInfo, m_Instance, &m_DebugLayer);
+#endif // _DEBUG
+
+#ifdef NDEBUG
+		result = vkGenerics::CreateInstance(instanceInfo, m_Instance);
+#endif // NDEBUG
+		if (result != VK_SUCCESS)
+		{
+
+		}
+	}
 
 	VkInstance* GetInstance() const { return m_Instance; };
 
@@ -73,23 +105,22 @@ public:
 		VkResult result;
 
 		m_Instance = new vkInstanceContainer();
-		m_Instance->InitPointer();
 
-		VkApplicationInfo AppInfo = {};
-		AppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-		AppInfo.apiVersion = VK_API_VERSION_1_3;
-		AppInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 1, 0);
-		AppInfo.engineVersion = VK_MAKE_API_VERSION(0, 0, 1, 0);
-		AppInfo.pEngineName = "Minerva";
-		AppInfo.pApplicationName = "MinervaApplication";
-		AppInfo.pNext = nullptr;
+		VkApplicationInfo appInfo = {};
+		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+		appInfo.apiVersion = VK_API_VERSION_1_3;
+		appInfo.applicationVersion = VK_MAKE_API_VERSION(0, 1, 1, 0);
+		appInfo.engineVersion = VK_MAKE_API_VERSION(0, 0, 1, 0);
+		appInfo.pEngineName = "Minerva";
+		appInfo.pApplicationName = "MinervaApplication";
+		appInfo.pNext = VK_NULL_HANDLE;
 		//Creation information for a VkInstance
 		VkInstanceCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-		createInfo.pApplicationInfo = &AppInfo;
+		createInfo.pApplicationInfo = &appInfo;
 		createInfo.enabledExtensionCount = vkGenerics::UnsignedRecast<size_t, size_t>(instanceExtensions.size());
 		createInfo.ppEnabledExtensionNames = instanceExtensions.data();
-		createInfo.ppEnabledLayerNames = nullptr;
+		createInfo.ppEnabledLayerNames = VK_NULL_HANDLE;
 		createInfo.enabledLayerCount = 0;
 
 #ifdef _DEBUG

@@ -256,6 +256,7 @@ HostAccessablePtr HostAccessableMemoryPool::MemAlloc(void* data, uint32_t size)
 		vkGenerics::UnmapMemory(*m_Device, *m_MemoryBuffer);
 		newPtr.memoryID.m_location.m_Offset = bestFitResults;
 		newPtr.memoryID.m_location.m_Size = memoryAllocationSize;
+		newPtr.m_State = VK_SUCCESS;
 		newPtr.m_Home = this;
 		++m_Counter;
 		++m_Noise;
@@ -273,6 +274,7 @@ HostAccessablePtr HostAccessableMemoryPool::MemAlloc(void* data, uint32_t size)
 	newPtr.memoryID.m_location.m_Offset = newOffset;
 	newPtr.memoryID.m_location.m_Size = memoryAllocationSize;
 	newPtr.m_Home = this;
+	newPtr.m_State = VK_SUCCESS;
 	m_LastOffset = newOffset;
 	m_LastSize = memoryAllocationSize;
 	m_ActivePtr.push_back(newPtr.memoryID.m_ID);
@@ -499,6 +501,8 @@ GPUKernel::GPUKernel(GPUHandle* handle, std::wstring shaderFileLocation, std::st
 	m_ShaderInfo->stage = VK_SHADER_STAGE_COMPUTE_BIT;
 	m_ShaderInfo->pName = shaderEntryPoint.c_str();
 	m_ShaderInfo->pNext = VK_NULL_HANDLE;
+
+
 
 	VkResult result = vkGenerics::CreateShaderModule(shaderFileLocation, *m_Device, m_ShaderInfo->module);
 	if (result != VK_SUCCESS)
