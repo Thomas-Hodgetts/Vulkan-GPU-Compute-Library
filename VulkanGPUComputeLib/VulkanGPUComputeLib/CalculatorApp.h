@@ -6,7 +6,7 @@
 struct CalculatorData
 {
 	float m_FirstNumber = 0, m_SecondNumber = 0, m_Output = 0, m_Padding = 0;
-	bool m_Addition = false, m_Subtraction = false, m_Multiplication = false, m_Division = false;
+	int m_Addition = 0, m_Subtraction = 0, m_Multiplication = 0, m_Division = 0;
 };
 
 
