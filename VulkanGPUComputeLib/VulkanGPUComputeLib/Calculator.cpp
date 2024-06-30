@@ -7,7 +7,8 @@ void CalculatorApp()
 	// System Set up
 	vkGenerics::vkQueueFamilyBit bit = vkGenerics::vkQueueFamilyBit::BASE;
 	bit |= vkGenerics::vkQueueFamilyBit::COMPUTE;
-	uint32_t memorySize = (sizeof(CalculatorData));
+	//multiplied by 2 due to nvidia/AMD differences
+	uint32_t memorySize = (sizeof(CalculatorData) * 2);
 	CalculatorData inputData;
 	VkExecuteHint hint = VkExecuteHint();
 
